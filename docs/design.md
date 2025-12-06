@@ -1,13 +1,18 @@
 # Storyteller Personalized Feed – System Design (Tech Lead Task)
 
 ## 1) Scope & Goals
-- Deliver personalized vertical video feed for mobile SDKs using existing backend/CMS.
-- Meet SLA from brief: 3k RPS peak, p95<250ms / p99<600ms for 20 items, freshness: content ≤60s, signals lag ≤5m, retention 90d, multi-tenant (120), feature-flag kill switch.
-- Prototype-level clarity: show architecture, data, APIs, rollout/observability, trade-offs, and next steps.
+- Deliver a personalized vertical video feed for mobile SDKs using the existing backend/CMS, rolled out behind a feature flag with safe fallback.
+- Meet non-negotiable constraints:
+  - Scale: peak 3k RPS (avg ~600).
+  - Latency: p95 < 250 ms; p99 < 600 ms for 20 items.
+  - Freshness: content visible ≤ 60 s; user-signal lag ≤ 5 min.
+  - Privacy: hashed user_id only; no PII outside VNet; event retention 90 days.
+  - Multi-tenant: 120 tenants; per-tenant weights/flags.
+- Prototype deliverables: architecture, data/API contracts, rollout/observability, trade-offs, and a working endpoint with caching.
+- Keep design pragmatic/minimal now; note clear next steps for future improvements.
 
 ## 2) Architecture Overview
 ![Architecture](arch-personalized-feed.drawio.png)
-- Source: `docs/arch-personalized-feed.drawio` (edit there, export PNG here).
 - Flow: SDK → API Gateway → Feed Service → Ranking Service → Content DB; signals via Event Ingest → Batch Aggregator → Profile Cache; feed responses cached; flags/observability as control plane; CMS publishes content and invalidates feed cache.
 
 ## 3) Components (current prototype)

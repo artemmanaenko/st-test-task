@@ -76,13 +76,13 @@
         <mxCell id="edge_signalsStore_aggregator" edge="1" parent="1" source="signalsStore" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;dashed=1;" target="aggregator">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge_aggregator_signalsCache" edge="1" parent="1" source="aggregator" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" target="signalsCache">
+        <mxCell id="edge_aggregator_signalsCache" edge="1" parent="1" source="aggregator" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="signalsCache">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge_flags_feed" edge="1" parent="1" source="flags" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=none;endFill=0;dashed=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="feed">
+        <mxCell id="edge_flags_feed" edge="1" parent="1" source="flags" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;dashed=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="feed">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edge_flags_ranking" edge="1" parent="1" source="flags" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=oval;endFill=0;dashed=1;" target="ranking">
+        <mxCell id="edge_flags_ranking" edge="1" parent="1" source="flags" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;dashed=1;" target="ranking">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="edge_feed_observability" edge="1" parent="1" source="feed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;dashed=1;" target="observability">
