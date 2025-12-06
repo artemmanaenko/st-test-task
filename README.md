@@ -59,6 +59,8 @@ java -version  # Should show version 21.x.x
 
 ### Run Services
 
+**Ensure Docker Desktop is running** before executing any of the commands below.
+
 Build and start the complete environment (API, DB, Redis, Nginx):
 
 ```bash

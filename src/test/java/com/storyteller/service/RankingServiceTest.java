@@ -5,6 +5,7 @@ import com.storyteller.dto.UserProfile;
 import com.storyteller.model.Tenant;
 import com.storyteller.model.Video;
 import com.storyteller.repository.TenantRepository;
+import com.storyteller.repository.EditorialBoostRepository;
 import com.storyteller.repository.VideoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ class RankingServiceTest {
 
     @Mock
     private TenantRepository tenantRepository;
+
+    @Mock
+    private EditorialBoostRepository editorialBoostRepository;
 
     @Mock
     private RedisTemplate<String, UserProfile> userProfileTemplate;
@@ -75,6 +79,7 @@ class RankingServiceTest {
         videos = Arrays.asList(video1, video2);
 
         when(userProfileTemplate.opsForValue()).thenReturn(valueOperations);
+        when(editorialBoostRepository.findActiveBoosts(anyList(), any())).thenReturn(Collections.emptyList());
     }
 
     @Test

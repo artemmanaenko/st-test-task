@@ -66,10 +66,11 @@ public class FeedService {
     }
 
     /**
-     * Generate ETag for fallback feeds.
+     * Generate a weak ETag for fallback feeds so clients can re-use cached responses.
+     * Format example: W/"fallback-<tenantId>-v1"
      */
     public String generateETag(UUID tenantId) {
-        return "fallback-" + tenantId + "-v1";
+        return String.format("W/\"fallback-%s-v1\"", tenantId);
     }
 
     private String buildCacheKey(UUID tenantId, String userIdHash, int limit, boolean personalized) {
