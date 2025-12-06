@@ -6,10 +6,13 @@ import com.storyteller.service.FeedService;
 import com.storyteller.service.FeatureFlagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -29,15 +32,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(controllers = FeedController.class)
 @AutoConfigureMockMvc
+@Import(FeedControllerETagTest.MockConfig.class)
 class FeedControllerETagTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private FeedService feedService;
 
-    @MockBean
+    @Autowired
     private FeatureFlagService featureFlagService;
 
     private UUID tenantId;
@@ -47,6 +51,7 @@ class FeedControllerETagTest {
 
     @BeforeEach
     void setUp() {
+        Mockito.reset(feedService, featureFlagService);
         tenantId = UUID.randomUUID();
         userIdHash = "a".repeat(64); // Valid SHA-256 hash format
 
@@ -174,6 +179,19 @@ class FeedControllerETagTest {
         assertThat(etag1).isNotEqualTo(etag2);
         assertThat(etag1).contains(tenant1.toString().substring(0, 8));
         assertThat(etag2).contains(tenant2.toString().substring(0, 8));
+    }
+
+    @TestConfiguration
+    static class MockConfig {
+        @Bean
+        FeedService feedService() {
+            return Mockito.mock(FeedService.class);
+        }
+
+        @Bean
+        FeatureFlagService featureFlagService() {
+            return Mockito.mock(FeatureFlagService.class);
+        }
     }
 }
 
