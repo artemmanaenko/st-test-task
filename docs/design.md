@@ -93,9 +93,17 @@
   **Future:** adjust shard count based on load and consider sharding by other fields to keep distribution even.
 
 ## 11) Next Steps / With More Time
-- Online profile updates: move from coarse batch to more frequent cron/micro-batch; keep it lightweight (avoid heavy Kafka for cost now) while improving freshness.
-- Ranking quality: add diversity/dup controls and expand business/policy/maturity filters.
-- Logging: ship convenient structured logging for faster debugging and tracing.
-- Observability: add dashboards and SLOs with burn-rate alerts (latency, errors, cache hit rate, aggregation lag).
-- Data-driven optimization: use the dashboards/SLO signals to decide when to change architecture (e.g., more shards, bus adoption, caching tiers).
+
+- Deployment & security options
+  - Deploy to cloud (e.g., AWS) to validate in real environments.
+  - Enable edge protection (e.g., AWS Shield/WAF) and tighten service security.
+  - Configure CDN properly for static assets and feed responses where applicable.
+  - Set up autoscaling policies for API and supporting services.
+- Performance & testing actions
+  - Provide a repeatable performance/load test script (wrk/k6/JMeter) with env defaults.
+  - Online profile updates: move from coarse batch to more frequent cron/micro-batch; keep it lightweight (avoid heavy Kafka for cost now) while improving freshness.
+  - Ranking quality: add diversity/dup controls and expand business/policy/maturity filters.
+  - Observability: add dashboards and SLOs with burn-rate alerts (latency, errors, cache hit rate, aggregation lag).
+  - Logging: ship convenient structured logging for faster debugging and tracing.
+  - Data-driven optimization: use the dashboards/SLO signals to decide when to change architecture (e.g., more shards, bus adoption, caching tiers).
 
