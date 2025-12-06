@@ -23,7 +23,7 @@
 - Profile Cache (Redis): `profile:{user_hash}` hot aggregates from events; written by AggregationService; read by Ranking.
 - Feed Cache (Redis): `feed:{tenant}:{user}:{limit}:personalized` or `feed:{tenant}:fallback:{limit}`; written/read by Feed Service; TTL 45s.
 - Content DB (Postgres): `videos`, `tenants`, `editorial_boosts`.
-- Events DB (Postgres): `user_events` (retention 90d).
+- Events DB (Postgres): `user_events` sharded by month/year for fast writes/reads; retention 90d.
 - Batch Aggregator: scheduled (3m) aggregation from recent events → profiles in Redis.
 - CMS: manages videos/boosts/tenant weights; webhook to invalidate feed cache.
 - Feature Flags: per-tenant personalization toggle + global kill-switch (InternalController).
@@ -76,14 +76,26 @@
 - Alerts: p99 latency breach; cache hit rate collapse; 5xx spike; aggregation delay >5m.
 
 ## 10) Trade-offs & Decisions
-- Simple heuristic ranking (recency/popularity/affinity + boosts) vs ML — chosen for speed and transparency.
-- Redis for both profiles and feed responses — meets latency; keeps Postgres simpler.
-- Aggregation batch (3m) vs streaming — meets ≤5m lag with lower complexity.
-- Tenant flags at service layer (not gateway) — simpler integration; gateway flagging can be added later.
+- Ranking evolution (keep simple first):
+  - **Now:** simple heuristics (recency/popularity/affinity + boosts) for speed and transparency.
+  - **Mid-step:** add lightweight local classifiers (Python) or public models to enrich content/user signals for richer ranking without heavy infra.
+  - **Later:** heavier ML/recommender stack if/when needed.
+- Redis for both profiles and feed responses — meets latency; keeps Postgres simpler.  
+  **Future:** add compression and/or an extra caching tier to save network traffic and memory at scale.
+- Event ingest — **Now:** direct-to-DB, cheapest/simple.  
+  **Mid-step:** tighter cron/micro-batching without a bus to improve freshness.  
+  **Future:** move to a message bus (e.g., Kafka) for durability, back-pressure, and fan-out to aggregation/analytics at higher scale.
+- Aggregation — **Now:** fixed 3m batch meets ≤5m lag with low complexity.  
+  **Future:** adaptive cadence (driven by monitoring/load), or streaming/incremental updates if freshness needs tighten.
+- Tenant flags — **Now:** handled at service layer (simple integration).  
+  **Future:** move to gateway-level flagging to cut downstream load; all needed data is available at the edge.
+- Event storage sharding — **Now:** month/year sharded `user_events` to speed writes/reads.  
+  **Future:** adjust shard count based on load and consider sharding by other fields to keep distribution even.
 
 ## 11) Next Steps / With More Time
-- Online/streaming updates for profiles; per-event incremental updates.
-- Diversity and duplication controls; maturity/policy filters.
-- Bandits/ML model; offline eval + A/B infra.
-- Expand observability dashboards; SLOs with burn-rate alerts.
+- Online profile updates: move from coarse batch to more frequent cron/micro-batch; keep it lightweight (avoid heavy Kafka for cost now) while improving freshness.
+- Ranking quality: add diversity/dup controls and expand business/policy/maturity filters.
+- Logging: ship convenient structured logging for faster debugging and tracing.
+- Observability: add dashboards and SLOs with burn-rate alerts (latency, errors, cache hit rate, aggregation lag).
+- Data-driven optimization: use the dashboards/SLO signals to decide when to change architecture (e.g., more shards, bus adoption, caching tiers).
 
