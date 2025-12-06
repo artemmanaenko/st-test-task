@@ -17,11 +17,11 @@ I acted like an engineering lead: I didn’t hand-type the code, but I reviewed 
 
 ## What worked well
 - Grok3: gave a detailed read of the brief, clarified expectations and “why”, and surfaced current industry best practices.  
-- Cursor + Claude Sonnet 4.5: spun up infra largely on its own, offered solid troubleshooting hints, and generated code quickly.  
+- Cursor IDE + Claude Sonnet 4.5: spun up infra largely on its own, offered solid troubleshooting hints, and generated code quickly.  
 - Quality/throughput: codegen was fast and good enough to keep momentum; with human review on top, it stayed reliable.
 
 ## What didn’t
 - Grok3’s proposed project structure was unusable (non-working files) and had to be discarded.  
-- Started on Anthropic and immediately hit token limits, so I had to switch to Cursor/Claude to complete the work.  
+- Started on Antigravity IDE and immediately hit token limits, so I had to switch to Cursor IDE/Claude to complete the work.  
 - Some AI suggestions tried to bloat data models beyond the “keep it simple” requirement; I trimmed them back to stay within the brief.
 
