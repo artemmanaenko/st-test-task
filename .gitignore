@@ -1,0 +1,26 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+target/
+
+# Logs
+*.log
+
+# Docker volumes (if any local mounts)
+*.env.local
+
