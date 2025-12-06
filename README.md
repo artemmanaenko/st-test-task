@@ -460,29 +460,15 @@ The `test-services.sh` script runs 10 comprehensive tests:
 
 ### Complete E2E Workflow
 
-Start from scratch:
+Run everything with one command:
 ```bash
-# 1. Clean everything
-docker compose down -v
-docker system prune -f
-./gradlew clean
-
-# 2. Build and start
-docker compose build api
-docker compose up -d
-
-# 3. Wait for health check
-sleep 10 && curl http://localhost:8080/actuator/health
-
-# 4. Generate test data
-./scripts/generate-test-data.sh
-
-# 5. Run all tests
-./scripts/test-services.sh
-./gradlew test
+./scripts/e2e.sh
 ```
 
-Total time: ~60 seconds from zero to fully tested system.
+Options:
+- Skip `docker system prune`: `SKIP_PRUNE=1 ./scripts/e2e.sh`
+
+The script stops old containers, cleans, builds, starts the stack, waits for health, seeds test data, runs integration checks, and finishes with `./gradlew test`. Total time: ~60 seconds from zero to fully tested system.
 
 ---
 
