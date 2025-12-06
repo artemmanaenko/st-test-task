@@ -11,22 +11,22 @@ BASE_URL="http://localhost:8080"
 TENANT_ID="11111111-1111-1111-1111-111111111111"
 USER_HASH=$(echo -n 'test_user' | shasum -a 256 | cut -d' ' -f1)
 
-echo "🧪 Testing Storyteller Services"
+echo "Testing Storyteller Services"
 echo "================================"
 echo ""
 
 # Helper function for colored output
 print_test() {
-    echo -e "\n📋 TEST: $1"
+    echo -e "\nTEST: $1"
     echo "---"
 }
 
 print_success() {
-    echo "✅ $1"
+    echo "PASS: $1"
 }
 
 print_error() {
-    echo "❌ $1"
+    echo "FAIL: $1"
     exit 1
 }
 
@@ -65,7 +65,7 @@ RESPONSE=$(curl -s "$BASE_URL/v1/feed?tenantId=$FALLBACK_TENANT&userIdHash=test&
 if echo "$RESPONSE" | jq -e '.items | length > 0' > /dev/null 2>&1; then
     ITEM_COUNT=$(echo "$RESPONSE" | jq '.items | length')
     print_success "RankingService returned sorted feed ($ITEM_COUNT items, sorted by popularity DESC)"
-    echo "   ℹ️  Fallback feed uses popularity-based ranking only"
+    echo "   INFO: Fallback feed uses popularity-based ranking only"
 else
     print_error "RankingService failed"
 fi
@@ -79,7 +79,7 @@ sleep 1
 # Verify fallback mode
 RESPONSE=$(curl -i -s "$BASE_URL/v1/feed?tenantId=$TENANT_ID&userIdHash=$USER_HASH&limit=5")
 if echo "$RESPONSE" | grep -q "ETag:"; then
-    print_success "FeatureFlagService: Kill-switch disabled → ETag present (fallback mode)"
+    print_success "FeatureFlagService: Kill-switch disabled -> ETag present (fallback mode)"
 else
     print_error "FeatureFlagService: Kill-switch failed"
 fi
@@ -90,7 +90,7 @@ sleep 1
 
 RESPONSE=$(curl -i -s "$BASE_URL/v1/feed?tenantId=$TENANT_ID&userIdHash=$USER_HASH&limit=5")
 if echo "$RESPONSE" | grep -q "Cache-Control: max-age=30, private"; then
-    print_success "FeatureFlagService: Kill-switch enabled → Personalized mode restored"
+    print_success "FeatureFlagService: Kill-switch enabled -> Personalized mode restored"
 else
     print_error "FeatureFlagService: Re-enable failed"
 fi
@@ -110,9 +110,9 @@ TIME2=$(date +%s%N)
 DURATION2=$(( (TIME2 - TIME1) / 1000000 ))
 
 if [ $DURATION2 -lt $DURATION1 ]; then
-    print_success "FeedCacheService: Cache hit detected (${DURATION1}ms → ${DURATION2}ms)"
+    print_success "FeedCacheService: Cache hit detected (${DURATION1}ms -> ${DURATION2}ms)"
 else
-    echo "⚠️  Cache performance: ${DURATION1}ms → ${DURATION2}ms (may vary)"
+    echo "WARNING: Cache performance: ${DURATION1}ms -> ${DURATION2}ms (may vary)"
 fi
 
 # Invalidate cache via CMS webhook
@@ -152,9 +152,9 @@ PROFILES_UPDATED=$(echo "$AGG_RESULT" | jq -r '.profiles_updated // 0')
 if [ "$PROFILES_UPDATED" -gt 0 ]; then
     print_success "AggregationService: Manual aggregation completed, $PROFILES_UPDATED profile(s) updated"
 else
-    echo "ℹ️  AggregationService: No new profiles to update"
+    echo "INFO: AggregationService: No new profiles to update"
 fi
-echo "ℹ️  Note: Automatic aggregation runs every 3 minutes. Manual: POST /internal/trigger-aggregation"
+echo "INFO: Note: Automatic aggregation runs every 3 minutes. Manual: POST /internal/trigger-aggregation"
 
 echo ""
 echo "================================"
@@ -170,10 +170,10 @@ if echo "$RESPONSE" | jq -e '.items | length >= 2' > /dev/null 2>&1; then
     # Note: We can't directly check scores, but we can verify ordering
     VIDEO_COUNT=$(echo "$RESPONSE" | jq '.items | length')
     print_success "Ranking Math: Fallback feed returned $VIDEO_COUNT videos (sorted by popularity DESC)"
-    echo "   ℹ️  Formula: popularityScore = video.popularityScore / 100.0"
-    echo "   ℹ️  Videos should be ordered by popularity_score descending"
+    echo "   INFO: Formula: popularityScore = video.popularityScore / 100.0"
+    echo "   INFO: Videos should be ordered by popularity_score descending"
 else
-    echo "⚠️  Ranking Math: Not enough videos to test popularity ranking"
+    echo "WARNING: Ranking Math: Not enough videos to test popularity ranking"
 fi
 
 # TEST 7: Recency Score (exponential decay)
@@ -182,12 +182,12 @@ RESPONSE=$(curl -s "$BASE_URL/v1/feed?tenantId=$TENANT_ID&userIdHash=$USER_HASH&
 if echo "$RESPONSE" | jq -e '.items | length >= 2' > /dev/null 2>&1; then
     VIDEO_COUNT=$(echo "$RESPONSE" | jq '.items | length')
     print_success "Ranking Math: Recency score calculated for $VIDEO_COUNT videos"
-    echo "   ℹ️  Formula: recencyScore = exp(-daysSinceCreation / 7.0)"
-    echo "   ℹ️  Newer videos (created today) should rank higher than older ones"
-    echo "   ℹ️  Video 7 days old: score ≈ 0.368 (1/e)"
-    echo "   ℹ️  Video 14 days old: score ≈ 0.135"
+    echo "   INFO: Formula: recencyScore = exp(-daysSinceCreation / 7.0)"
+    echo "   INFO: Newer videos (created today) should rank higher than older ones"
+    echo "   INFO: Video 7 days old: score ~ 0.368 (1/e)"
+    echo "   INFO: Video 14 days old: score ~ 0.135"
 else
-    echo "⚠️  Ranking Math: Not enough videos to test recency"
+    echo "WARNING: Ranking Math: Not enough videos to test recency"
 fi
 
 # TEST 8: User Affinity Score
@@ -211,11 +211,11 @@ for i in {1..5}; do
 done
 
 print_success "Ranking Math: 5 LIKE events ingested for affinity test"
-echo "   ℹ️  Formula: affinityScore = average(tagScores[videoTags]) / 10.0"
-echo "   ℹ️  Event scores: LIKE=1.0, SHARE=2.0, VIEW=0.1 (from RankingDefaults)"
-echo "   ℹ️  Profile aggregation runs every 3 minutes"
-echo "   ℹ️  After aggregation, user should have higher affinity for 'cats' tag"
-echo "   ⚠️  Note: Affinity effect may not be visible immediately (wait for aggregation job)"
+echo "   INFO: Formula: affinityScore = average(tagScores[videoTags]) / 10.0"
+echo "   INFO: Event scores: LIKE=1.0, SHARE=2.0, VIEW=0.1 (from RankingDefaults)"
+echo "   INFO: Profile aggregation runs every 3 minutes"
+echo "   INFO: After aggregation, user should have higher affinity for 'cats' tag"
+echo "   WARNING: Note: Affinity effect may not be visible immediately (wait for aggregation job)"
 
 # TEST 9: Editorial Boost
 print_test "9. Ranking Math - Editorial Boost"
@@ -247,24 +247,24 @@ SQL
         
         if [ "$FIRST_VIDEO_ID" == "$BOOST_VIDEO_ID" ]; then
             print_success "Ranking Math: Editorial boost working (boosted video is #1)"
-            echo "   ℹ️  Formula: totalScore = baseScore + boostFactor"
-            echo "   ℹ️  Boost factor: $BOOST_FACTOR added to final score"
-            echo "   ℹ️  Boosted video should rank significantly higher"
+            echo "   INFO: Formula: totalScore = baseScore + boostFactor"
+            echo "   INFO: Boost factor: $BOOST_FACTOR added to final score"
+            echo "   INFO: Boosted video should rank significantly higher"
         else
-            echo "⚠️  Ranking Math: Boosted video not at #1 (found at position: checking...)"
+            echo "WARNING: Ranking Math: Boosted video not at #1 (found at position: checking...)"
             POSITION=$(echo "$RESPONSE" | jq -r ".items | to_entries | map(select(.value.videoId == \"$BOOST_VIDEO_ID\")) | .[0].key")
             if [ "$POSITION" != "null" ]; then
-                echo "   ℹ️  Boosted video found at position $((POSITION + 1))"
-                echo "   ℹ️  Boost factor: $BOOST_FACTOR (should significantly increase ranking)"
+                echo "   INFO: Boosted video found at position $((POSITION + 1))"
+                echo "   INFO: Boost factor: $BOOST_FACTOR (should significantly increase ranking)"
             else
-                echo "   ⚠️  Boosted video not found in top 5 results"
+                echo "   WARNING: Boosted video not found in top 5 results"
             fi
         fi
     else
-        echo "⚠️  Ranking Math: Could not create editorial boost (DB access issue)"
+        echo "WARNING: Ranking Math: Could not create editorial boost (DB access issue)"
     fi
 else
-    echo "⚠️  Ranking Math: Could not test editorial boost (DB container not found)"
+    echo "WARNING: Ranking Math: Could not test editorial boost (DB container not found)"
 fi
 
 # TEST 10: Weighted Sum Formula
@@ -273,35 +273,35 @@ RESPONSE=$(curl -s "$BASE_URL/v1/feed?tenantId=$TENANT_ID&userIdHash=$TEST_USER_
 if echo "$RESPONSE" | jq -e '.items | length > 0' > /dev/null 2>&1; then
     VIDEO_COUNT=$(echo "$RESPONSE" | jq '.items | length')
     print_success "Ranking Math: Weighted sum calculated for $VIDEO_COUNT videos"
-    echo "   ℹ️  Formula: totalScore = (w_recency × recencyScore) +"
-    echo "                (w_popularity × popularityScore) +"
-    echo "                (w_affinity × affinityScore) +"
+    echo "   INFO: Formula: totalScore = (w_recency * recencyScore) +"
+    echo "                (w_popularity * popularityScore) +"
+    echo "                (w_affinity * affinityScore) +"
     echo "                editorialBoost"
-    echo "   ℹ️  Default weights: recency=0.3, popularity=0.4, affinity=0.3"
-    echo "   ℹ️  Videos sorted by totalScore DESC"
+    echo "   INFO: Default weights: recency=0.3, popularity=0.4, affinity=0.3"
+    echo "   INFO: Videos sorted by totalScore DESC"
 else
-    echo "⚠️  Ranking Math: Could not verify weighted sum"
+    echo "WARNING: Ranking Math: Could not verify weighted sum"
 fi
 
 echo ""
 echo "================================"
-echo "✅ All Service Tests Completed!"
+echo "All Service Tests Completed!"
 echo "================================"
 echo ""
 echo "Summary:"
-echo "  1. ✅ FeedService - Personalized feed working"
-echo "  2. ✅ RankingService - Popularity-based ranking working"
-echo "  3. ✅ FeatureFlagService - Kill-switch toggle working"
-echo "  4. ✅ FeedCacheService - Cache invalidation working"
-echo "  5. ✅ AggregationService - Event ingestion working"
-echo "  6. ✅ Ranking Math - Popularity score normalization"
-echo "  7. ✅ Ranking Math - Recency score (exponential decay)"
-echo "  8. ✅ Ranking Math - User affinity score"
-echo "  9. ✅ Ranking Math - Editorial boost"
-echo "  10. ✅ Ranking Math - Weighted sum formula"
+echo "  1. PASS: FeedService - Personalized feed working"
+echo "  2. PASS: RankingService - Popularity-based ranking working"
+echo "  3. PASS: FeatureFlagService - Kill-switch toggle working"
+echo "  4. PASS: FeedCacheService - Cache invalidation working"
+echo "  5. PASS: AggregationService - Event ingestion working"
+echo "  6. PASS: Ranking Math - Popularity score normalization"
+echo "  7. PASS: Ranking Math - Recency score (exponential decay)"
+echo "  8. PASS: Ranking Math - User affinity score"
+echo "  9. PASS: Ranking Math - Editorial boost"
+echo "  10. PASS: Ranking Math - Weighted sum formula"
 echo ""
-echo "📊 View detailed logs:"
+echo "View detailed logs:"
 echo "   docker compose logs api | tail -50"
 echo ""
-echo "📖 See ranking mathematics documentation:"
+echo "See ranking mathematics documentation:"
 echo "   See README.md section 'Ranking Algorithm & Mathematics'"

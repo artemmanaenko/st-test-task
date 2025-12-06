@@ -24,3 +24,6 @@ target/
 # Docker volumes (if any local mounts)
 *.env.local
 
+# Project-specific
+INITIAL_PROMPT.md
+GIT_SETUP.md

@@ -48,7 +48,7 @@ class FeedControllerETagTest extends AbstractIntegrationTest {
         Tenant tenant = Tenant.builder()
                 .tenantId(tenantId)
                 .name("ETag Test Tenant")
-                .personalizedEnabled(false) // ✅ Fallback mode → ETag should work
+                .personalizedEnabled(false) // Fallback mode -> ETag should work
                 .build();
         tenantRepository.save(tenant);
 
@@ -105,7 +105,7 @@ class FeedControllerETagTest extends AbstractIntegrationTest {
                         .param("tenantId", tenantId.toString())
                         .param("userIdHash", userIdHash)
                         .param("limit", "10")
-                        .header(HttpHeaders.IF_NONE_MATCH, etag)) // ✅ Send ETag back
+                        .header(HttpHeaders.IF_NONE_MATCH, etag)) // Send ETag back
                 // Then: Returns 304 Not Modified
                 .andExpect(status().isNotModified())
                 .andExpect(header().exists(HttpHeaders.ETAG))
@@ -133,7 +133,7 @@ class FeedControllerETagTest extends AbstractIntegrationTest {
         Tenant tenant = Tenant.builder()
                 .tenantId(personalizedTenantId)
                 .name("Personalized Tenant")
-                .personalizedEnabled(true) // ✅ Personalized mode
+                .personalizedEnabled(true) // Personalized mode
                 .build();
         tenantRepository.save(tenant);
 

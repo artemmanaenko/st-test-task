@@ -170,9 +170,9 @@ curl -H "If-None-Match: abc123..." \
 
 **Ranking Formula:**
 ```
-totalScore = (w_recency × recencyScore) +
-             (w_popularity × popularityScore) +
-             (w_affinity × affinityScore) +
+totalScore = (w_recency * recencyScore) +
+             (w_popularity * popularityScore) +
+             (w_affinity * affinityScore) +
              editorialBoost
 ```
 
@@ -242,9 +242,9 @@ The personalized video feed uses a **weighted sum** ranking algorithm that combi
 ### Core Formula
 
 ```
-totalScore = (w_recency × recencyScore) + 
-             (w_popularity × popularityScore) + 
-             (w_affinity × affinityScore) + 
+totalScore = (w_recency * recencyScore) + 
+             (w_popularity * popularityScore) + 
+             (w_affinity * affinityScore) + 
              editorialBoost
 ```
 
@@ -266,16 +266,16 @@ recencyScore = exp(-daysSinceCreation / RECENCY_DECAY_DAYS)
 
 - **Default decay**: 7 days (`RECENCY_DECAY_DAYS = 7.0`)
 - **Behavior**:
-  - Video created today: `recencyScore ≈ 1.0`
-  - Video 7 days old: `recencyScore ≈ 0.368`
-  - Video 14 days old: `recencyScore ≈ 0.135`
-  - Older videos → exponentially lower scores
+  - Video created today: `recencyScore ~ 1.0`
+  - Video 7 days old: `recencyScore ~ 0.368`
+  - Video 14 days old: `recencyScore ~ 0.135`
+  - Older videos -> exponentially lower scores
 
 **Example:**
 ```java
 // Video created 3 days ago
 daysSinceCreation = 3
-recencyScore = exp(-3 / 7.0) ≈ 0.651
+recencyScore = exp(-3 / 7.0) ~ 0.651
 ```
 
 #### 2. Popularity Score (Linear Normalization)
@@ -323,7 +323,7 @@ affinityScore = min(7.85 / 10.0, 1.0) = 0.785
 User profiles are built from events using **decay + accumulation**:
 
 ```
-newTagScore = (oldTagScore × PROFILE_DECAY_FACTOR) + eventScore
+newTagScore = (oldTagScore * PROFILE_DECAY_FACTOR) + eventScore
 ```
 
 - **Decay factor**: 0.9 (`RankingDefaults.PROFILE_DECAY_FACTOR = 0.9f`)
@@ -339,7 +339,7 @@ newTagScore = (oldTagScore × PROFILE_DECAY_FACTOR) + eventScore
 // User has "cats" tag with score 5.0
 // User likes a video tagged ["cats"]
 oldScore = 5.0
-decayedScore = 5.0 × 0.9 = 4.5
+decayedScore = 5.0 * 0.9 = 4.5
 newScore = 4.5 + 1.0 = 5.5
 ```
 
@@ -386,12 +386,12 @@ editorialBoost = 5.0
 // Weights: recency=0.3, popularity=0.4, affinity=0.3
 // Editorial boost: boost_factor=5.0 (active)
 
-recencyScore = exp(-2 / 7.0) ≈ 0.751
+recencyScore = exp(-2 / 7.0) ~ 0.751
 popularityScore = 80 / 100.0 = 0.8
 affinityScore = min((9.0 + 8.0) / 2 / 10.0, 1.0) = 0.85
 editorialBoost = 5.0
 
-baseScore = (0.3 × 0.751) + (0.4 × 0.8) + (0.3 × 0.85)
+baseScore = (0.3 * 0.751) + (0.4 * 0.8) + (0.3 * 0.85)
           = 0.225 + 0.32 + 0.255
           = 0.8
 
@@ -443,7 +443,7 @@ The `test-services.sh` script runs 10 comprehensive tests:
 10. **Editorial Boost** - Tests boost application
 11. **Weighted Sum** - Tests complete ranking formula
 
-**Expected output:** All tests should show ✅
+**Expected output:** All tests should show PASS
 
 ### Unit Tests
 
