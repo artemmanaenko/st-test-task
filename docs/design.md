@@ -27,7 +27,18 @@
 - Batch Aggregator: scheduled (3m) aggregation from recent events → profiles in Redis.
 - CMS: manages videos/boosts/tenant weights; webhook to invalidate feed cache.
 - Feature Flags: per-tenant personalization toggle + global kill-switch (InternalController).
-- Observability: logs + metrics (p95/p99, errors, CTR/adoption placeholders).
+- Observability: today only logs; metrics (p95/p99, errors, cache hit, adoption/CTR) and dashboards are planned.
+
+## 4) Latency Budget (target p95 < 250 ms, p99 < 600 ms for 20 items)
+- Personalized, cache HIT: Redis fetch/deserialize 5–10 ms, minor app overhead 10–20 ms → ~20–30 ms (ample headroom).
+- Personalized, cache MISS:
+  - Tenant/profile lookup (Redis + repo) ~10–20 ms.
+  - Videos + boosts read (Postgres, indexed) ~50–90 ms.
+  - Scoring 20 items (in-memory) ~10–25 ms.
+  - Response build + network/request overhead ~20–40 ms.
+  - Expected p95 path: ~100–175 ms; p99 still under 250–300 ms with current volumes.
+- Fallback, cache MISS: videos read + popularity sort ~60–100 ms; response + overhead ~20–40 ms → ~80–140 ms.
+- Safety margin to p99 600 ms covers DB jitter and GC/network variance; further protection via cache TTL (45s) and fallback path.
 
 ## 4) Data Model (minimal)
 - Postgres

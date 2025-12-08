@@ -1,46 +1,46 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.2.4">
   <diagram name="Architecture" id="arch-personalized-feed">
-    <mxGraphModel dx="1234" dy="711" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+    <mxGraphModel dx="1452" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="sdk" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="SDK / Mobile App&#xa;(hashed user_id, device ctx)" vertex="1">
+        <mxCell id="sdk" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" value="SDK / Mobile App&#xa;(hashed user_id, device ctx)" vertex="1">
           <mxGeometry height="70" width="160" x="40" y="200" as="geometry" />
         </mxCell>
-        <mxCell id="gateway" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="API Gateway" vertex="1">
+        <mxCell id="gateway" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b1ddf0;strokeColor=#10739e;" value="API Gateway" vertex="1">
           <mxGeometry height="50" width="130" x="250" y="210" as="geometry" />
         </mxCell>
-        <mxCell id="feed" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Feed Service" vertex="1">
+        <mxCell id="feed" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fad7ac;strokeColor=#b46504;" value="Feed Service" vertex="1">
           <mxGeometry height="50" width="130" x="430" y="210" as="geometry" />
         </mxCell>
-        <mxCell id="ranking" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Ranking Service&#xa;filters + scoring + diversity" vertex="1">
+        <mxCell id="ranking" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fad7ac;strokeColor=#b46504;" value="Ranking Service&#xa;filters + scoring + diversity" vertex="1">
           <mxGeometry height="50" width="160" x="620" y="210" as="geometry" />
         </mxCell>
-        <mxCell id="contentCache" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Feed Cache&lt;br&gt;(Redis, 45s TTL)" vertex="1">
+        <mxCell id="contentCache" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6d0de;strokeColor=#996185;gradientColor=#d5739d;" value="Feed Cache&lt;br&gt;(Redis, 45s TTL)" vertex="1">
           <mxGeometry height="45" width="180" x="810" y="210" as="geometry" />
         </mxCell>
         <mxCell id="contentStore" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Content DB (Postgres)&#xa;videos, boosts, tenants" vertex="1">
           <mxGeometry height="50" width="180" x="940" y="280" as="geometry" />
         </mxCell>
-        <mxCell id="signalsCache" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Profile Cache&#xa;(Redis, hot aggregates)" vertex="1">
-          <mxGeometry height="50" width="165" x="617.5" y="320" as="geometry" />
+        <mxCell id="signalsCache" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6d0de;strokeColor=#996185;gradientColor=#d5739d;" value="Profile Cache&#xa;(Redis, hot aggregates)" vertex="1">
+          <mxGeometry height="50" width="165" x="617.5" y="350" as="geometry" />
         </mxCell>
         <mxCell id="signalsStore" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Events DB (Postgres)&#xa;user_events, 90d" vertex="1">
-          <mxGeometry height="50" width="170" x="615" y="414" as="geometry" />
+          <mxGeometry height="50" width="170" x="615" y="444" as="geometry" />
         </mxCell>
-        <mxCell id="cms" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="CMS&#xa;content, boosts, per-tenant weights" vertex="1">
+        <mxCell id="cms" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;gradientColor=#7ea6e0;" value="CMS&#xa;content, boosts, per-tenant weights" vertex="1">
           <mxGeometry height="50" width="200" x="930" y="50" as="geometry" />
         </mxCell>
-        <mxCell id="ingest" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#2e73b4;" value="Event Ingest&#xa;(stream/queue)" vertex="1">
-          <mxGeometry height="50" width="130" x="250" y="414" as="geometry" />
+        <mxCell id="ingest" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0cee2;strokeColor=#56517e;" value="Event Ingest&#xa;(stream/queue)" vertex="1">
+          <mxGeometry height="50" width="130" x="250" y="444" as="geometry" />
         </mxCell>
-        <mxCell id="aggregator" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#2e73b4;" value="Batch Aggregator&#xa;&lt;=5m SLA" vertex="1">
-          <mxGeometry height="50" width="150" x="430" y="414" as="geometry" />
+        <mxCell id="aggregator" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;gradientColor=#ea6b66;" value="Batch Aggregator&#xa;&lt;=5m SLA" vertex="1">
+          <mxGeometry height="50" width="150" x="430" y="444" as="geometry" />
         </mxCell>
-        <mxCell id="flags" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f2f2f2;strokeColor=#666666;" value="Feature Flags&lt;br&gt;kill switch, rollout, tenant weights" vertex="1">
+        <mxCell id="flags" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;gradientColor=#7ea6e0;" value="Feature Flags&lt;br&gt;kill switch, rollout, tenant weights" vertex="1">
           <mxGeometry height="50" width="190" x="605" y="50" as="geometry" />
         </mxCell>
-        <mxCell id="observability" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f2f2f2;strokeColor=#666666;" value="Observability / Alerts&#xa;p95/p99, errors, CTR, adoption" vertex="1">
+        <mxCell id="observability" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;gradientColor=#7ea6e0;" value="Observability / Alerts&#xa;p95/p99, errors, CTR, adoption" vertex="1">
           <mxGeometry height="50" width="190" x="120" y="50" as="geometry" />
         </mxCell>
         <mxCell id="edge_sdk_gateway" edge="1" parent="1" source="sdk" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;" target="gateway">
@@ -110,6 +110,18 @@
             <mxPoint x="620" y="250" as="sourcePoint" />
             <mxPoint x="905" y="180" as="targetPoint" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="scoringStrategy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3c800;strokeColor=#B09500;dashed=1;fontColor=#000000;" value="Scoring Model Strategy&#xa;(pluggable)" vertex="1">
+          <mxGeometry height="40" width="170" x="320" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_ranking_strategy" edge="1" parent="1" source="ranking" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;dashed=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" target="scoringStrategy">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aggStrategy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3c800;strokeColor=#B09500;dashed=1;fontColor=#000000;" value="Profile Aggregator Strategy&#xa;(pluggable)" vertex="1">
+          <mxGeometry height="40" width="165" x="422.5" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_aggregator_strategy" edge="1" parent="1" source="aggregator" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;dashed=1;" target="aggStrategy">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
