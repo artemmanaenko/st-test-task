@@ -80,6 +80,7 @@
   - **Now:** simple heuristics (recency/popularity/affinity + boosts) for speed and transparency.
   - **Mid-step:** add lightweight local classifiers (Python) or public models to enrich content/user signals for richer ranking without heavy infra.
   - **Later:** heavier ML/recommender stack if/when needed.
+- Domain isolation: ranking scoring and profile aggregation are extracted into pluggable domain strategies (baseline impl now), so A/B or tenant-specific formulas can be swapped without touching service orchestration.
 - Redis for both profiles and feed responses — meets latency; keeps Postgres simpler.  
   **Future:** add compression and/or an extra caching tier to save network traffic and memory at scale.
 - Event ingest — **Now:** direct-to-DB, cheapest/simple.  
@@ -95,6 +96,7 @@
 ## 11) Next Steps / With More Time
 
 - Online profile updates: move from coarse batch to more frequent cron/micro-batch; keep it lightweight (avoid heavy Kafka for cost now) while improving freshness.
+- CMS-driven aggregation selection: allow choosing different profile aggregation/decay policies per tenant (similar to scoring models) for experiments and gradual rollouts.
 - Ranking quality: add diversity/dup controls and expand business/policy/maturity filters.
 - Logging: ship convenient structured logging for faster debugging and tracing.
 - Observability: add dashboards and SLOs with burn-rate alerts (latency, errors, cache hit rate, aggregation lag).
