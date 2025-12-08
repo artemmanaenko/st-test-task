@@ -1,6 +1,6 @@
 package com.storyteller.service;
 
-import com.storyteller.config.RankingDefaults;
+import com.storyteller.domain.ranking.RankingDefaults;
 import com.storyteller.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class FeatureFlagService {
 
     @Cacheable("featureFlags")
     public boolean isPersonalizedEnabled(UUID tenantId) {
+        Objects.requireNonNull(tenantId, "tenantId must not be null");
         log.debug("Checking personalization flag for tenant {}", tenantId);
         return tenantRepository.findById(tenantId)
                 .map(t -> {

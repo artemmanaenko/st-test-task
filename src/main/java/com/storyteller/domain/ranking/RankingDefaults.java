@@ -1,4 +1,4 @@
-package com.storyteller.config;
+package com.storyteller.domain.ranking;
 
 import java.util.Map;
 

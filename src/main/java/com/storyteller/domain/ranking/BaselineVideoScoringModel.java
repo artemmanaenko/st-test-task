@@ -1,6 +1,5 @@
 package com.storyteller.domain.ranking;
 
-import com.storyteller.config.RankingDefaults;
 import com.storyteller.dto.RankingWeights;
 import com.storyteller.dto.UserProfile;
 import com.storyteller.model.EditorialBoost;

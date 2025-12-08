@@ -1,6 +1,6 @@
 package com.storyteller.domain.profile;
 
-import com.storyteller.config.RankingDefaults;
+import com.storyteller.domain.ranking.RankingDefaults;
 import com.storyteller.dto.UserProfile;
 import com.storyteller.model.UserEvent;
 import com.storyteller.model.Video;
