@@ -99,6 +99,7 @@
 - Logging: ship convenient structured logging for faster debugging and tracing.
 - Observability: add dashboards and SLOs with burn-rate alerts (latency, errors, cache hit rate, aggregation lag).
 - Data-driven optimization: use the dashboards/SLO signals to decide when to change architecture (e.g., more shards, bus adoption, caching tiers).
+- CMS-driven scoring selection: allow choosing/scoping different scoring models per tenant from CMS (feature-flag/A-B) to safely roll out and compare formulas.
 
 Additional options (deployment & perf):
 - Deploy to cloud (e.g., AWS) to validate in real environments.

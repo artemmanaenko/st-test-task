@@ -7,6 +7,7 @@ import com.storyteller.model.Video;
 import com.storyteller.repository.TenantRepository;
 import com.storyteller.repository.EditorialBoostRepository;
 import com.storyteller.repository.VideoRepository;
+import com.storyteller.domain.ranking.IVideoScoringModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,16 +18,19 @@ import org.mockito.quality.Strictness;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.lang.NonNull;
 
 import java.time.Instant;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
+@SuppressWarnings("NullAway") // Mockito stubbing triggers false positives for non-null parameters
 class RankingServiceTest {
 
     @Mock
@@ -44,20 +48,23 @@ class RankingServiceTest {
     @Mock
     private ValueOperations<String, UserProfile> valueOperations;
 
+    @Mock
+    private IVideoScoringModel videoScoringModel;
+
     @InjectMocks
     private RankingService rankingService;
 
-    private UUID tenantId;
+    @NonNull
+    private static final UUID TENANT_ID = Objects.requireNonNull(
+            UUID.fromString("11111111-1111-1111-1111-111111111111"));
     private Tenant tenant;
     private List<Video> videos;
 
     @BeforeEach
     void setUp() {
-        tenantId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-
         RankingWeights config = new RankingWeights(0.3f, 0.4f, 0.3f);
         tenant = Tenant.builder()
-                .tenantId(tenantId)
+                .tenantId(TENANT_ID)
                 .name("Test Tenant")
                 .weights(config)
                 .build();
@@ -80,12 +87,13 @@ class RankingServiceTest {
 
         when(userProfileTemplate.opsForValue()).thenReturn(valueOperations);
         when(editorialBoostRepository.findActiveBoosts(anyList(), any())).thenReturn(Collections.emptyList());
+        when(videoScoringModel.score(any(), any(), any(), any())).thenReturn(1.0);
     }
 
     @Test
     void testRankVideos_WithUserProfile() {
         // Given
-        when(tenantRepository.findById(tenantId)).thenReturn(Optional.of(tenant));
+        doReturn(Optional.of(tenant)).when(tenantRepository).findById(TENANT_ID);
         when(videoRepository.findAll()).thenReturn(videos);
 
         Map<String, Float> tagScores = new HashMap<>();
@@ -93,27 +101,27 @@ class RankingServiceTest {
         tagScores.put("funny", 8.0f);
         UserProfile userProfile = new UserProfile(tagScores, "v1");
 
-        when(valueOperations.get(anyString())).thenReturn(userProfile);
+        doReturn(userProfile).when(valueOperations).get("profile:userhash");
 
         // When
-        List<Video> rankedVideos = rankingService.rankVideos(tenantId, "userhash", 10);
+        List<Video> rankedVideos = rankingService.rankVideos(TENANT_ID, "userhash", 10);
 
         // Then
         assertNotNull(rankedVideos);
         assertEquals(2, rankedVideos.size());
-        verify(tenantRepository).findById(tenantId);
+        verify(tenantRepository).findById(TENANT_ID);
         verify(videoRepository).findAll();
     }
 
     @Test
     void testRankVideos_NoUserProfile() {
         // Given
-        when(tenantRepository.findById(tenantId)).thenReturn(Optional.of(tenant));
+        doReturn(Optional.of(tenant)).when(tenantRepository).findById(TENANT_ID);
         when(videoRepository.findAll()).thenReturn(videos);
-        when(valueOperations.get(anyString())).thenReturn(null);
+        doReturn(null).when(valueOperations).get("profile:userhash");
 
         // When
-        List<Video> rankedVideos = rankingService.rankVideos(tenantId, "userhash", 10);
+        List<Video> rankedVideos = rankingService.rankVideos(TENANT_ID, "userhash", 10);
 
         // Then
         assertNotNull(rankedVideos);
@@ -123,11 +131,11 @@ class RankingServiceTest {
     @Test
     void testRankVideos_TenantNotFound() {
         // Given
-        when(tenantRepository.findById(tenantId)).thenReturn(Optional.empty());
+        doReturn(Optional.empty()).when(tenantRepository).findById(TENANT_ID);
 
         // When & Then
         assertThrows(IllegalArgumentException.class, () -> {
-            rankingService.rankVideos(tenantId, "userhash", 10);
+            rankingService.rankVideos(TENANT_ID, "userhash", 10);
         });
     }
 
@@ -163,11 +171,11 @@ class RankingServiceTest {
     @Test
     void testRankVideos_EmptyVideoList() {
         // Given
-        when(tenantRepository.findById(tenantId)).thenReturn(Optional.of(tenant));
+        doReturn(Optional.of(tenant)).when(tenantRepository).findById(TENANT_ID);
         when(videoRepository.findAll()).thenReturn(Collections.emptyList());
 
         // When
-        List<Video> rankedVideos = rankingService.rankVideos(tenantId, "userhash", 10);
+        List<Video> rankedVideos = rankingService.rankVideos(TENANT_ID, "userhash", 10);
 
         // Then
         assertNotNull(rankedVideos);
