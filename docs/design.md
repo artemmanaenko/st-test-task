@@ -30,17 +30,18 @@
 - Observability: today only logs; metrics (p95/p99, errors, cache hit, adoption/CTR) and dashboards are planned.
 
 ## 4) Latency Budget (target p95 < 250 ms, p99 < 600 ms for 20 items)
-- Personalized, cache HIT: Redis fetch/deserialize 5–10 ms, minor app overhead 10–20 ms → ~20–30 ms (ample headroom).
-- Personalized, cache MISS:
+- Edge/network: DNS + TLS + API Gateway routing/auth ~20–50 ms p95 (assumes warmed connections/CDN or LB close to clients).
+- Personalized, cache HIT: Redis fetch/deserialize 5–10 ms, app overhead 10–20 ms → ~20–30 ms (app tier), end-to-end with edge ~40–80 ms.
+- Personalized, cache MISS (app tier):
   - Tenant/profile lookup (Redis + repo) ~10–20 ms.
   - Videos + boosts read (Postgres, indexed) ~50–90 ms.
   - Scoring 20 items (in-memory) ~10–25 ms.
-  - Response build + network/request overhead ~20–40 ms.
-  - Expected p95 path: ~100–175 ms; p99 still under 250–300 ms with current volumes.
-- Fallback, cache MISS: videos read + popularity sort ~60–100 ms; response + overhead ~20–40 ms → ~80–140 ms.
-- Safety margin to p99 600 ms covers DB jitter and GC/network variance; further protection via cache TTL (45s) and fallback path.
+  - Response build + serialization ~10–20 ms.
+  - App subtotal: ~80–155 ms; adding edge/network → ~100–205 ms p95.
+- Fallback, cache MISS: videos read + popularity sort ~60–100 ms; response ~10–20 ms → ~70–120 ms app; with edge ~90–170 ms.
+- Safety margin to p99 600 ms covers DB jitter, cold connections, GC, and regional variance; additional protection via feed cache TTL (45s) and fallback path.
 
-## 4) Data Model (minimal)
+## 5) Data Model (minimal)
 - Postgres
   - `videos(video_id PK, title, url, thumbnail_url, tags[], popularity_score, created_at)`
   - `tenants(tenant_id PK, name, weights JSON/columns, personalized_enabled bool)`
@@ -50,7 +51,7 @@
   - Profile cache: `profile:{user_hash}` → `UserProfile(tagScores map, version)`, TTL via rewrite; hot aggregates.
   - Feed cache: `feed:{tenant}:{user}:{limit}:personalized` and `feed:{tenant}:fallback:{limit}` → `FeedResponse`, TTL 45s.
 
-## 5) API Contract (prototype)
+## 6) API Contract (prototype)
 - `GET /v1/feed?tenantId={uuid}&userIdHash={hash}&limit={int=20}`
   - 200 OK: `{"items":[{videoId,title,url,thumbnailUrl}], "feedId": "<uuid>"}` (feedId = response version)
   - Caching:
@@ -66,25 +67,21 @@
   - `POST /internal/tenant-flag?tenantId&enabled=bool` → per-tenant flag.
   - `POST /internal/trigger-aggregation` → manual profile recompute.
 
-## 6) CMS Configuration & Delivery Rules
+## 7) CMS Configuration & Delivery Rules
 - Editorial boosts per video (time-bounded).
 - Tenant-specific ranking weights (recency/popularity/affinity).
 - Personalization flag per tenant (enable/disable).
 - Webhook to invalidate feed cache on content/config changes.
 
-## 7) Caching Strategy
+## 8) Caching Strategy
 - Feed cache (Redis, 45s): keyed by tenant/user/limit or fallback; owned by Feed Service.
 - Profile cache (Redis): hot aggregates from events; refresh every ≤3m aggregation; decays old scores.
 - HTTP caching: ETag + public max-age for non-personalized; short private max-age for personalized.
 
-## 8) Rollout, Fallback, Safety
+## 9) Rollout, Fallback, Safety
 - Feature flags: per-tenant + global kill switch. Fail-safe default = non-personalized if tenant missing.
 - Fallback feed: popularity-based, ETag-enabled.
 - Cache miss/degradation: serve fallback if profile missing or ranking errors.
-
-## 9) Observability (initial)
-- Metrics: p95/p99 latency / RPS / error rate for /feed; cache hit rate (feed cache, profile cache); aggregation lag; personalization adoption (% personalized responses); CTR proxy via events.
-- Alerts: p99 latency breach; cache hit rate collapse; 5xx spike; aggregation delay >5m.
 
 ## 10) Trade-offs & Decisions
 - Ranking evolution (keep simple first):
@@ -103,6 +100,7 @@
   **Future:** move to gateway-level flagging to cut downstream load; all needed data is available at the edge.
 - Event storage sharding — **Now:** month/year sharded `user_events` to speed writes/reads.  
   **Future:** adjust shard count based on load and consider sharding by other fields to keep distribution even.
+- Observability — Now: logs only. Planned: metrics/alerts (p95/p99, errors, cache hit, aggregation lag, personalization adoption/CTR proxy).
 
 ## 11) Next Steps / With More Time
 

@@ -1,8 +1,12 @@
-# AI Usage Notes (Storyteller Tech Lead Task)
+# AI Usage Notes
 
-## How I used AI (common Agile SDLC, human in the loop)
+## How I used AI
+
+### Methodology
+Common iterative Agile, single-person team covering all roles
+
 ### Execution style
-I acted like an engineering lead: I didn’t hand-type the code, but I reviewed and validated every change. Cursor/Claude did the typing; I used my eyes and voice to direct and approve the work. This is “engineering with AI,” not fire-and-forget coding.
+I acted as the orchestrator: defined requirements, checked work, and made decisions; the AI played multiple roles (coder, doc drafter, suggester). Code and docs look auto-generated because the AI did the typing under my direction, but the output is the result of my decomposition and review, not a single prompt or fire-and-forget generation.
 
 ### Steps
 - **Briefing & requirements:** used Grok3 to simulate a customer meeting, read the brief, clarified unclear points, and collected current best practices.  
